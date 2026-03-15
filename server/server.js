@@ -27,6 +27,7 @@ const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
 const bookingRoutes = require('./routes/bookings');
 const dashboardRoutes = require('./routes/dashboard');
+const userRoutes = require('./routes/users');
 
 const app = express();
 app.set('trust proxy', true); // Allow Cloudflare & Vite proxies for Rate Limiting & secure cookies
@@ -131,11 +132,65 @@ app.use(globalLimiter);
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
+const chatbotRoutes = require('./routes/chatbotRoutes');
+
 app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', dataLimiter, roomRoutes);
 app.use('/api/bookings', dataLimiter, bookingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/users', dataLimiter, userRoutes);
+app.use('/api/chatbot', dataLimiter, chatbotRoutes);
+
+// ─── Public: Browse rooms (for visitors) ──────────────────────────────────────
+const RoomModel = require('./models/Room');
+app.get('/api/public/rooms', dataLimiter, async (req, res, next) => {
+    try {
+        const { roomType, checkInDate, checkOutDate } = req.query;
+        const pool = require('./config/db');
+
+        let query = `SELECT r.*, COALESCE(r.image_url, '') AS image_url FROM rooms r WHERE r.status != 'maintenance'`;
+        const values = [];
+        let idx = 1;
+
+        if (roomType) {
+            query += ` AND r.room_type = $${idx++}`;
+            values.push(roomType);
+        }
+
+        // Filter out rooms that have overlapping confirmed bookings
+        if (checkInDate && checkOutDate) {
+            query += ` AND r.id NOT IN (
+                SELECT b.room_id FROM bookings b
+                WHERE b.booking_status = 'confirmed'
+                  AND b.check_in_date < $${idx + 1}
+                  AND b.check_out_date > $${idx}
+            )`;
+            values.push(checkInDate, checkOutDate);
+            idx += 2;
+        }
+
+        query += ` ORDER BY r.room_number ASC`;
+        const result = await pool.query(query, values);
+
+        const rooms = result.rows.map((row) => ({
+            id: row.id,
+            roomNumber: row.room_number,
+            roomType: row.room_type,
+            pricePerNight: parseFloat(row.price_per_night),
+            status: row.status,
+            capacity: row.capacity,
+            floorNumber: row.floor_number,
+            description: row.description,
+            imageUrl: row.image_url,
+        }));
+
+        res.status(200).json({ success: true, count: rooms.length, data: rooms });
+    } catch (error) {
+        next(error);
+    }
+});
 
 // Health check — minimal info exposed (no DB type)
 app.get('/api/health', (req, res) => {

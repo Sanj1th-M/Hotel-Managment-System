@@ -35,7 +35,7 @@ const bookingUpdateValidation = [
         .isEmail().normalizeEmail().withMessage('Invalid email address'),
     body('checkInDate').optional().isISO8601().withMessage('Valid check-in date required'),
     body('checkOutDate').optional().isISO8601().withMessage('Valid check-out date required'),
-    body('bookingStatus').optional().isIn(['confirmed', 'completed', 'cancelled']).withMessage('Invalid booking status'),
+    body('bookingStatus').optional().isIn(['confirmed', 'completed', 'cancelled', 'Pending']).withMessage('Invalid booking status'),
     body('notes').optional().isString().trim().isLength({ max: 500 }),
 ];
 
@@ -132,7 +132,7 @@ const createBooking = async (req, res, next) => {
         const overlapResult = await client.query(
             `SELECT 1 FROM bookings
              WHERE room_id = $1
-               AND booking_status = 'confirmed'
+               AND booking_status IN ('confirmed', 'Pending')
                AND check_in_date  < $3
                AND check_out_date > $2`,
             [roomRow.id, checkInDate, checkOutDate]
@@ -155,7 +155,7 @@ const createBooking = async (req, res, next) => {
             `INSERT INTO bookings
                 (guest_name, guest_phone, guest_email, room_id, check_in_date, check_out_date,
                  total_price, booking_status, notes, created_by)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, 'confirmed', $8, $9)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, 'Pending', $8, $9)
              RETURNING id`,
             [
                 guestName,
@@ -251,7 +251,7 @@ const updateBooking = async (req, res, next) => {
             const overlapResult = await client.query(
                 `SELECT 1 FROM bookings
                  WHERE room_id = $1
-                   AND booking_status = 'confirmed'
+                   AND booking_status IN ('confirmed', 'Pending')
                    AND id <> $4
                    AND check_in_date  < $3
                    AND check_out_date > $2`,

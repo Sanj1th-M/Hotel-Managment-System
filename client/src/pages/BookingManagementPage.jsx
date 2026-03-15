@@ -12,7 +12,7 @@ const StatusBadge = ({ status }) => (
     </span>
 )
 
-const STATUSES = ['confirmed', 'cancelled', 'completed']
+const STATUSES = ['Pending', 'confirmed', 'cancelled', 'completed']
 
 export default function BookingManagementPage() {
     const { isAdmin } = useAuth()
@@ -63,7 +63,7 @@ export default function BookingManagementPage() {
     const cancelBooking = async (id) => {
         if (!window.confirm('Cancel this booking?')) return
         try {
-            await api.put(`/bookings/${id}`, { bookingStatus: 'cancelled' })
+            await api.put(`/bookings/admin/update-booking-status/${id}`, { bookingStatus: 'cancelled' })
             toast.success('Booking cancelled.')
             fetchBookings()
         } catch (err) {
@@ -71,10 +71,21 @@ export default function BookingManagementPage() {
         }
     }
 
+    const confirmBooking = async (id) => {
+        if (!window.confirm('Confirm this booking?')) return
+        try {
+            await api.put(`/bookings/admin/update-booking-status/${id}`, { bookingStatus: 'confirmed' })
+            toast.success('Booking confirmed.')
+            fetchBookings()
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Confirm failed.')
+        }
+    }
+
     const completeBooking = async (id) => {
         if (!window.confirm('Mark this booking as completed?')) return
         try {
-            await api.put(`/bookings/${id}`, { bookingStatus: 'completed' })
+            await api.put(`/bookings/admin/update-booking-status/${id}`, { bookingStatus: 'completed' })
             toast.success('Booking marked as completed.')
             fetchBookings()
         } catch (err) {
@@ -221,9 +232,14 @@ export default function BookingManagementPage() {
                                                 <Link to={`/bookings/${booking.id}`} className="btn-ghost border border-slate-200 px-3 py-2 text-slate-700 hover:bg-slate-100">
                                                     View
                                                 </Link>
-                                                {booking.bookingStatus === 'confirmed' && (
+                                                {booking.bookingStatus === 'Pending' && isAdmin && (
+                                                    <button onClick={() => confirmBooking(booking.id)} className="btn-ghost border border-emerald-200 px-3 py-2 text-emerald-700 hover:bg-emerald-50">
+                                                        Confirm
+                                                    </button>
+                                                )}
+                                                {(booking.bookingStatus === 'Pending' || booking.bookingStatus === 'confirmed') && (
                                                     <>
-                                                        {isAdmin && (
+                                                        {booking.bookingStatus === 'confirmed' && isAdmin && (
                                                             <button onClick={() => completeBooking(booking.id)} className="btn-ghost border border-emerald-200 px-3 py-2 text-emerald-700 hover:bg-emerald-50">
                                                                 Complete
                                                             </button>

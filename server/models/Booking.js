@@ -141,7 +141,7 @@ const findById = async (id) => {
  * Create a new booking.
  * @returns {object} Created booking (with JOINs)
  */
-const createBooking = async ({ guestName, guestPhone, guestEmail, roomId, checkInDate, checkOutDate, totalPrice, bookingStatus = 'confirmed', notes = '', createdBy }) => {
+const createBooking = async ({ guestName, guestPhone, guestEmail, roomId, checkInDate, checkOutDate, totalPrice, bookingStatus = 'Pending', notes = '', createdBy }) => {
     const result = await pool.query(
         `INSERT INTO bookings
             (guest_name, guest_phone, guest_email, room_id, check_in_date, check_out_date, total_price, booking_status, notes, created_by)
@@ -216,7 +216,7 @@ const checkOverlap = async (roomId, checkIn, checkOut, excludeId = null) => {
     let query = `
         SELECT 1 FROM bookings
         WHERE room_id = $1
-          AND booking_status = 'confirmed'
+          AND booking_status IN ('confirmed', 'Pending')
           AND check_in_date  < $3
           AND check_out_date > $2
     `;

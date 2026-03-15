@@ -19,6 +19,8 @@ const getDashboardStats = async (req, res, next) => {
             cancelledBookings,
             occupiedResult,
             recentResult,
+            supportTicketsResult,
+            openTicketsResult,
         ] = await Promise.all([
             RoomModel.countByStatus(null),
             RoomModel.countByStatus('maintenance'),
@@ -36,7 +38,7 @@ const getDashboardStats = async (req, res, next) => {
                   AND CURRENT_DATE < check_out_date
             `),
             // Recent 5 confirmed bookings with room info (JOIN)
-            pool.query(`
+            pool.query(
                 SELECT
                     b.id,
                     b.guest_name,
@@ -52,7 +54,26 @@ const getDashboardStats = async (req, res, next) => {
                 WHERE b.booking_status = 'confirmed'
                 ORDER BY b.created_at DESC
                 LIMIT 5
-            `),
+            ),
+            // Latest guest support tickets with user profile
+            pool.query(
+                SELECT
+                    st.id,
+                    st.message,
+                    st.status,
+                    st.created_at,
+                    u.id AS user_id,
+                    u.username,
+                    u.email,
+                    u.phone
+                FROM support_tickets st
+                JOIN users u ON u.id = st.user_id
+                ORDER BY st.created_at DESC
+                LIMIT 6
+            ),
+            pool.query(
+                SELECT COUNT(*) FROM support_tickets WHERE status = 
+            , ('open',)),
         ]);
 
         const occupiedRooms = parseInt(occupiedResult.rows[0].count, 10);

@@ -23,8 +23,16 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
+            // Prevent redirect loop if the request was the initial session restore check
+            if (error.config && error.config.url === '/auth/me') {
+                return Promise.reject(error)
+            }
+
+            // Public routes that should not trigger a force redirect
+            const publicRoutes = ['/login', '/register', '/rooms/browse']
+            
             // Cookie is expired or revoked — redirect to login
-            if (window.location.pathname !== '/login') {
+            if (!publicRoutes.includes(window.location.pathname)) {
                 window.location.href = '/login'
             }
         }

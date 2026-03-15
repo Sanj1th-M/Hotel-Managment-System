@@ -3,14 +3,18 @@ import { useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import RoomsPage from './pages/RoomsPage'
 import CreateBookingPage from './pages/CreateBookingPage'
 import BookingManagementPage from './pages/BookingManagementPage'
 import BookingDetailsPage from './pages/BookingDetailsPage'
+import VisitorRoomsPage from './pages/VisitorRoomsPage'
+import UserDashboard from './pages/UserDashboard'
+import UserBookingFlow from './pages/UserBookingFlow'
 
 export default function App() {
-    const { loading } = useAuth()
+    const { loading, user } = useAuth()
 
     if (loading) {
         return (
@@ -30,11 +34,20 @@ export default function App() {
 
     return (
         <Routes>
+            {/* Public routes */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/rooms/browse" element={<VisitorRoomsPage />} />
 
-            <Route element={<ProtectedRoute />}>
+            {/* User (guest) routes — role='user' only */}
+            <Route element={<ProtectedRoute allowedRoles={['user']} />}>
+                <Route path="/user/dashboard" element={<UserDashboard />} />
+                <Route path="/user/book" element={<UserBookingFlow />} />
+            </Route>
+
+            {/* Staff/Admin routes — existing dashboard, rooms, bookings */}
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'staff']} />}>
                 <Route element={<Layout />}>
-                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/rooms" element={<RoomsPage />} />
                     <Route path="/bookings" element={<BookingManagementPage />} />
@@ -43,7 +56,21 @@ export default function App() {
                 </Route>
             </Route>
 
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            {/* Default redirect based on role */}
+            <Route path="/" element={
+                user?.role === 'user'
+                    ? <Navigate to="/user/dashboard" replace />
+                    : user
+                        ? <Navigate to="/dashboard" replace />
+                        : <Navigate to="/rooms/browse" replace />
+            } />
+            <Route path="*" element={
+                user?.role === 'user'
+                    ? <Navigate to="/user/dashboard" replace />
+                    : user
+                        ? <Navigate to="/dashboard" replace />
+                        : <Navigate to="/rooms/browse" replace />
+            } />
         </Routes>
     )
 }

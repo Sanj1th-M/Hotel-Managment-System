@@ -21,7 +21,10 @@ const createTables = async () => {
                 email         VARCHAR(255) UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL,
                 role          VARCHAR(20)  NOT NULL DEFAULT 'staff'
-                              CHECK (role IN ('admin', 'staff')),
+                              CHECK (role IN ('admin', 'staff', 'user')),
+                phone         VARCHAR(20),
+                age           INTEGER,
+                photo_url     TEXT,
                 is_active     BOOLEAN DEFAULT TRUE,
                 created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
@@ -55,14 +58,17 @@ const createTables = async () => {
                 check_in_date   DATE NOT NULL,
                 check_out_date  DATE NOT NULL,
                 total_price     NUMERIC(10, 2) NOT NULL CHECK (total_price >= 0),
-                booking_status  VARCHAR(20) DEFAULT 'confirmed'
-                                CHECK (booking_status IN ('confirmed', 'cancelled', 'completed')),
+                booking_status  VARCHAR(20) DEFAULT 'Pending'
+                                CHECK (booking_status IN ('Pending', 'confirmed', 'cancelled', 'completed')),
+                persons         INTEGER DEFAULT 1 CHECK (persons >= 1 AND persons <= 10),
                 notes           TEXT DEFAULT '',
                 created_by      INTEGER REFERENCES users(id) ON DELETE SET NULL,
                 created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 CONSTRAINT chk_dates CHECK (check_out_date > check_in_date)
             );
         `);
+
+
 
         // ── Revoked Tokens (JTI denylist for token revocation) ────────────────
         await client.query(`

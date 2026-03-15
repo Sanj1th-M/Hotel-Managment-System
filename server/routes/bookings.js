@@ -32,4 +32,10 @@ router.put('/:id', bookingUpdateValidation, validate, updateBooking);
 // DELETE /api/bookings/:id — Admin only
 router.delete('/:id', requireRole('admin'), deleteBooking);
 
+// Alias: POST /api/bookings/book-room -> createBooking
+router.post('/book-room', bookingValidation, validate, createBooking);
+
+// Alias: PUT /api/bookings/admin/update-booking-status/:id -> updateBooking
+router.put('/admin/update-booking-status/:id', requireRole('admin'), bookingUpdateValidation, validate, updateBooking);
+
 module.exports = router;
