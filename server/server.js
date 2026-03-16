@@ -28,6 +28,7 @@ const roomRoutes = require('./routes/rooms');
 const bookingRoutes = require('./routes/bookings');
 const dashboardRoutes = require('./routes/dashboard');
 const userRoutes = require('./routes/users');
+const supportRoutes = require('./routes/supportRoutes');
 
 const app = express();
 app.set('trust proxy', true); // Allow Cloudflare & Vite proxies for Rate Limiting & secure cookies
@@ -142,6 +143,7 @@ app.use('/api/bookings', dataLimiter, bookingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', dataLimiter, userRoutes);
 app.use('/api/chatbot', dataLimiter, chatbotRoutes);
+app.use('/api/support', dataLimiter, supportRoutes);
 
 // ─── Public: Browse rooms (for visitors) ──────────────────────────────────────
 const RoomModel = require('./models/Room');

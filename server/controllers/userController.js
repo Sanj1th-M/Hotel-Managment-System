@@ -108,7 +108,7 @@ const getMyBookings = async (req, res, next) => {
             `SELECT
                 b.id, b.guest_name, b.guest_phone, b.guest_email,
                 b.check_in_date, b.check_out_date, b.total_price,
-                b.booking_status, b.persons, b.payment_id, b.notes, b.created_at,
+                b.booking_status, b.persons, b.notes, b.created_at,
                 r.id AS room_id, r.room_number, r.room_type,
                 r.price_per_night, r.status AS room_status,
                 r.floor_number, r.capacity, r.image_url AS room_image_url
@@ -130,7 +130,6 @@ const getMyBookings = async (req, res, next) => {
             totalPrice: parseFloat(row.total_price),
             bookingStatus: row.booking_status,
             persons: row.persons,
-            paymentId: row.payment_id,
             notes: row.notes,
             createdAt: row.created_at,
             room: row.room_id ? {

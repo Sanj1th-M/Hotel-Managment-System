@@ -12,6 +12,7 @@ import BookingDetailsPage from './pages/BookingDetailsPage'
 import VisitorRoomsPage from './pages/VisitorRoomsPage'
 import UserDashboard from './pages/UserDashboard'
 import UserBookingFlow from './pages/UserBookingFlow'
+import GuestSupportPage from './pages/GuestSupportPage'
 
 export default function App() {
     const { loading, user } = useAuth()
@@ -52,6 +53,7 @@ export default function App() {
                     <Route path="/rooms" element={<RoomsPage />} />
                     <Route path="/bookings" element={<BookingManagementPage />} />
                     <Route path="/bookings/new" element={<CreateBookingPage />} />
+                    <Route path="/support" element={<GuestSupportPage />} />
                     <Route path="/bookings/:id" element={<BookingDetailsPage />} />
                 </Route>
             </Route>

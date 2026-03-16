@@ -38,7 +38,7 @@ const getDashboardStats = async (req, res, next) => {
                   AND CURRENT_DATE < check_out_date
             `),
             // Recent 5 confirmed bookings with room info (JOIN)
-            pool.query(
+            pool.query(`
                 SELECT
                     b.id,
                     b.guest_name,
@@ -54,9 +54,9 @@ const getDashboardStats = async (req, res, next) => {
                 WHERE b.booking_status = 'confirmed'
                 ORDER BY b.created_at DESC
                 LIMIT 5
-            ),
+            `),
             // Latest guest support tickets with user profile
-            pool.query(
+            pool.query(`
                 SELECT
                     st.id,
                     st.message,
@@ -70,10 +70,10 @@ const getDashboardStats = async (req, res, next) => {
                 JOIN users u ON u.id = st.user_id
                 ORDER BY st.created_at DESC
                 LIMIT 6
-            ),
-            pool.query(
-                SELECT COUNT(*) FROM support_tickets WHERE status = 
-            , ('open',)),
+            `),
+            pool.query(`
+                SELECT COUNT(*) FROM support_tickets WHERE status = $1
+            `, ['open']),
         ]);
 
         const occupiedRooms = parseInt(occupiedResult.rows[0].count, 10);

@@ -21,6 +21,7 @@ const bookingValidation = [
     body('roomId').notEmpty().isInt({ min: 1 }).withMessage('Valid room ID (positive integer) is required'),
     body('checkInDate').isISO8601().withMessage('Valid check-in date required'),
     body('checkOutDate').isISO8601().withMessage('Valid check-out date required'),
+    body('persons').optional({ nullable: true, checkFalsy: true }).isInt({ min: 1, max: 10 }).withMessage('persons must be between 1 and 10'),
     body('notes').optional().isString().trim().isLength({ max: 500 }),
 ];
 
@@ -96,10 +97,10 @@ const getBookings = async (req, res, next) => {
  * SELECT FOR UPDATE row-level lock on the rooms row. This guarantees that no
  * two concurrent requests can book the same room for the same dates.
  */
-const createBooking = async (req, res, next) => {
+const createBookingInternal = (bookingStatus) => async (req, res, next) => {
     const client = await pool.connect();
     try {
-        const { guestName, guestPhone, guestEmail, roomId, checkInDate, checkOutDate, notes } = req.body;
+        const { guestName, guestPhone, guestEmail, roomId, checkInDate, checkOutDate, notes, persons } = req.body;
 
         const checkIn = new Date(checkInDate);
         const checkOut = new Date(checkOutDate);
@@ -128,6 +129,17 @@ const createBooking = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Room is under maintenance and cannot be booked.' });
         }
 
+        // Validate persons against room capacity (server-side source of truth)
+        const personsInt = persons === undefined || persons === null || persons === '' ? 1 : parseInt(persons, 10);
+        if (!Number.isInteger(personsInt) || personsInt < 1 || personsInt > 10) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ success: false, message: 'Persons must be between 1 and 10.' });
+        }
+        if (roomRow.capacity && personsInt > parseInt(roomRow.capacity, 10)) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ success: false, message: `Persons cannot exceed room capacity (${roomRow.capacity}).` });
+        }
+
         // Overlap check inside the transaction — safe from race conditions
         const overlapResult = await client.query(
             `SELECT 1 FROM bookings
@@ -154,8 +166,8 @@ const createBooking = async (req, res, next) => {
         const bookingResult = await client.query(
             `INSERT INTO bookings
                 (guest_name, guest_phone, guest_email, room_id, check_in_date, check_out_date,
-                 total_price, booking_status, notes, created_by)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, 'Pending', $8, $9)
+                 total_price, booking_status, persons, notes, created_by)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
              RETURNING id`,
             [
                 guestName,
@@ -165,6 +177,8 @@ const createBooking = async (req, res, next) => {
                 checkInDate,
                 checkOutDate,
                 totalPrice,
+                bookingStatus,
+                personsInt,
                 notes || '',
                 req.user.id,
             ]
@@ -183,6 +197,12 @@ const createBooking = async (req, res, next) => {
         client.release();
     }
 };
+
+// Admin/staff manual booking creation defaults to Pending
+const createBooking = createBookingInternal('Pending');
+
+// User booking flow: confirm immediately
+const createConfirmedBooking = createBookingInternal('confirmed');
 
 // ─── GET /api/bookings/:id ────────────────────────────────────────────────────
 const getBookingById = async (req, res, next) => {
@@ -355,6 +375,7 @@ const deleteBooking = async (req, res, next) => {
 module.exports = {
     getBookings,
     createBooking,
+    createConfirmedBooking,
     getBookingById,
     updateBooking,
     deleteBooking,

@@ -17,6 +17,7 @@ export default function UserBookingFlow() {
     const [step, setStep] = useState('details') // details | success
     const [loading, setLoading] = useState(false)
     const [bookingResult, setBookingResult] = useState(null)
+    const [showConfirm, setShowConfirm] = useState(false)
 
     const room = location.state?.room
     const initialCheckIn = location.state?.checkInDate || ''
@@ -44,27 +45,37 @@ export default function UserBookingFlow() {
         : 0
     const totalPrice = nights * room.pricePerNight
 
-    const handleBookRoom = async () => {
+    const validateBeforeConfirm = () => {
         if (!form.checkInDate || !form.checkOutDate) {
             toast.error('Please select check-in and check-out dates.')
-            return
+            return false
         }
         if (new Date(form.checkOutDate) <= new Date(form.checkInDate)) {
             toast.error('Check-out must be after check-in.')
-            return
+            return false
         }
         if (!form.guestName.trim()) {
             toast.error('Please enter guest name.')
-            return
+            return false
         }
         if (!form.guestPhone.trim()) {
             toast.error('Please enter phone number.')
-            return
+            return false
         }
         if (form.persons < 1 || form.persons > room.capacity) {
             toast.error(`Persons must be between 1 and ${room.capacity}.`)
-            return
+            return false
         }
+        return true
+    }
+
+    const handleBookRoom = () => {
+        if (!validateBeforeConfirm()) return
+        setShowConfirm(true)
+    }
+
+    const confirmAndBook = async () => {
+        setShowConfirm(false)
 
         setLoading(true)
         try {
@@ -83,7 +94,7 @@ export default function UserBookingFlow() {
                     booking: data.data
                 })
                 setStep('success')
-                toast.success('Room booked successfully! Awaiting confirmation.')
+                toast.success('Booking confirmed successfully.')
             } else {
                 toast.error(data.message || 'Failed to book room.')
             }
@@ -115,6 +126,59 @@ export default function UserBookingFlow() {
 
     return (
         <div className="min-h-screen bg-hotel-canvas">
+            {showConfirm && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/50 p-4">
+                    <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
+                        <div className="p-5 border-b border-slate-100">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Confirm booking</p>
+                            <h3 className="mt-2 text-lg font-bold text-slate-900">Review your details</h3>
+                            <p className="mt-1 text-sm text-slate-500">No payment gateway. This will immediately create a confirmed booking.</p>
+                        </div>
+
+                        <div className="p-5 space-y-3 text-sm">
+                            <div className="flex justify-between gap-4">
+                                <span className="text-slate-500">Room</span>
+                                <span className="font-semibold text-slate-900">Room {room.roomNumber} ({room.roomType})</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                                <span className="text-slate-500">Dates</span>
+                                <span className="font-semibold text-slate-900">{form.checkInDate} → {form.checkOutDate}</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                                <span className="text-slate-500">Guests</span>
+                                <span className="font-semibold text-slate-900">{form.persons}</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                                <span className="text-slate-500">Guest</span>
+                                <span className="font-semibold text-slate-900">{form.guestName}</span>
+                            </div>
+                            <div className="flex justify-between gap-4 border-t border-slate-100 pt-3">
+                                <span className="text-slate-500">Total</span>
+                                <span className="font-bold text-slate-900">₹ {totalPrice.toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        <div className="p-5 border-t border-slate-100 flex items-center justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirm(false)}
+                                className="btn-ghost"
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={confirmAndBook}
+                                className="btn-primary"
+                                disabled={loading}
+                            >
+                                Confirm booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Top Nav */}
             <header className="sticky top-0 z-50 border-b border-hotel-line bg-white/95 backdrop-blur">
                 <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">

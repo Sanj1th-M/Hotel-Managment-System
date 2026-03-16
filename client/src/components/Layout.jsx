@@ -5,18 +5,27 @@ import {
     BedDouble,
     CalendarCheck,
     PlusCircle,
+    LifeBuoy,
     LogOut,
     Hotel,
     User,
     Shield,
 } from 'lucide-react'
 
-const navItems = [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/rooms', label: 'Rooms', icon: BedDouble },
-    { to: '/bookings', label: 'Bookings', icon: CalendarCheck },
-    { to: '/bookings/new', label: 'New Booking', icon: PlusCircle },
-]
+function buildNavItems(isAdmin) {
+    const items = [
+        { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { to: '/rooms', label: 'Rooms', icon: BedDouble },
+        { to: '/bookings', label: 'Bookings', icon: CalendarCheck },
+        { to: '/bookings/new', label: 'New Booking', icon: PlusCircle },
+    ]
+
+    if (isAdmin) {
+        items.push({ to: '/support', label: 'Guest Support', icon: LifeBuoy })
+    }
+
+    return items
+}
 
 function matchesPath(currentPath, targetPath) {
     if (targetPath === '/dashboard') {
@@ -29,6 +38,7 @@ function matchesPath(currentPath, targetPath) {
 export default function Layout() {
     const { user, logout, isAdmin } = useAuth()
     const location = useLocation()
+    const navItems = buildNavItems(isAdmin)
     const activeItem = navItems.find((item) => matchesPath(location.pathname, item.to)) || navItems[0]
 
     return (

@@ -80,7 +80,7 @@ const downloadReceipt = async (req, res, next) => {
                 ['Room Number', `${booking.room.roomNumber}`],
                 ['Room Type', booking.room.roomType],
                 ['Floor', `${booking.room.floorNumber}`],
-                ['Price/Night', `₹${booking.room.pricePerNight.toFixed(2)}`],
+                ['Price/Night', `INR ${booking.room.pricePerNight.toFixed(2)}`],
             ];
 
             doc.font('Helvetica').fontSize(10);
@@ -105,7 +105,7 @@ const downloadReceipt = async (req, res, next) => {
 
         const paymentDetails = [
             ['Number of Nights', `${nights}`],
-            ['Total Amount', `₹${booking.totalPrice.toFixed(2)}`],
+            ['Total Amount', `INR ${booking.totalPrice.toFixed(2)}`],
             ['Payment Status', 'N/A'],
         ];
 
@@ -124,7 +124,7 @@ const downloadReceipt = async (req, res, next) => {
 
         // ── Total ─────────────────────────────────────────────────────────────
         doc.fontSize(16).font('Helvetica-Bold').fillColor('#000000')
-            .text(`Total: ₹${booking.totalPrice.toFixed(2)}`, { align: 'right' });
+            .text(`Total: INR ${booking.totalPrice.toFixed(2)}`, { align: 'right' });
 
         doc.moveDown(2);
 

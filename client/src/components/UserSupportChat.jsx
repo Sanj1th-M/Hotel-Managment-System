@@ -3,19 +3,22 @@ import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import { chatbotApi } from '../services/chatApi';
 
 const SPLINE_SCRIPT_SRC = 'https://unpkg.com/@splinetool/viewer@1.12.69/build/spline-viewer.js';
-const SPLINE_SCENE_URL = 'https://prod.spline.design/tno19tUqOeDSCuvU/scene.splinecode';
+const SPLINE_SCENE_URL = 'https://prod.spline.design/pC-N68y5i6Q8H1Pz/scene.splinecode';
 
 const RobotChatButton = ({ onClick }) => {
+    const [isLoaded, setIsLoaded] = useState(false);
+
     useEffect(() => {
-        if (document.querySelector('script[data-spline-viewer-script]')) {
-            return;
+        if (!document.querySelector('script[data-spline-viewer-script]')) {
+            const script = document.createElement('script');
+            script.src = SPLINE_SCRIPT_SRC;
+            script.type = 'module';
+            script.dataset.splineViewerScript = 'true';
+            document.head.appendChild(script);
         }
 
-        const script = document.createElement('script');
-        script.src = SPLINE_SCRIPT_SRC;
-        script.type = 'module';
-        script.dataset.splineViewerScript = 'true';
-        document.head.appendChild(script);
+
+
     }, []);
 
     return (
@@ -24,11 +27,17 @@ const RobotChatButton = ({ onClick }) => {
                 type='button'
                 onClick={onClick}
                 aria-label='Open Support Chat'
-                className='robot-button'
+                className={`robot-button ${!isLoaded ? 'is-loading' : ''}`}
             >
+                {/* Fallback Icon */}
+                <div className="robot-fallback-icon">
+                    <MessageCircle size={24} />
+                </div>
+
                 <div className='robot-spline-frame'>
                     <spline-viewer
                         url={SPLINE_SCENE_URL}
+                        onLoad={() => setIsLoaded(true)}
                         className='robot-spline'
                         style={{ width: '100%', height: '100%' }}
                     />
@@ -250,3 +259,4 @@ const UserSupportChat = () => {
 };
 
 export default UserSupportChat;
+

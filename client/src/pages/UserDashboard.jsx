@@ -252,7 +252,7 @@ export default function UserDashboard() {
                                             <p className="flex items-center text-lg font-bold text-slate-900">
                                                 <IndianRupee size={16} />{booking.totalPrice.toLocaleString()}
                                             </p>
-                                            {booking.bookingStatus === 'confirmed' && booking.paymentId && (
+                                            {booking.bookingStatus === 'confirmed' && (
                                                 <button
                                                     onClick={() => handleDownloadReceipt(booking.id)}
                                                     className="btn-secondary px-3 py-2 text-xs"

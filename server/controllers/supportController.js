@@ -2,8 +2,15 @@ const pool = require('../config/db');
 
 const getRecentSupportTickets = async (req, res, next) => {
     try {
+        const limit = Math.min(parseInt(req.query.limit ?? '50', 10) || 50, 200);
+        const status = req.query.status ? String(req.query.status) : null;
+
+        const whereClause = status ? 'WHERE st.status = $2' : '';
+        const params = status ? [limit, status] : [limit];
+
         const [ticketResult, openCountResult] = await Promise.all([
-            pool.query(`
+            pool.query(
+                `
                 SELECT
                     st.id,
                     st.message,
@@ -15,9 +22,12 @@ const getRecentSupportTickets = async (req, res, next) => {
                     u.phone
                 FROM support_tickets st
                 JOIN users u ON u.id = st.user_id
+                ${whereClause}
                 ORDER BY st.created_at DESC
-                LIMIT 6
-            `),
+                LIMIT $1
+            `,
+                params
+            ),
             pool.query('SELECT COUNT(*) FROM support_tickets WHERE status = $1', ['open']),
         ])
 

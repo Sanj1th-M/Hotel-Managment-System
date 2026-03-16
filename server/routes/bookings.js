@@ -3,6 +3,7 @@ const router = express.Router();
 const {
     getBookings,
     createBooking,
+    createConfirmedBooking,
     getBookingById,
     updateBooking,
     deleteBooking,
@@ -33,7 +34,7 @@ router.put('/:id', bookingUpdateValidation, validate, updateBooking);
 router.delete('/:id', requireRole('admin'), deleteBooking);
 
 // Alias: POST /api/bookings/book-room -> createBooking
-router.post('/book-room', bookingValidation, validate, createBooking);
+router.post('/book-room', bookingValidation, validate, createConfirmedBooking);
 
 // Alias: PUT /api/bookings/admin/update-booking-status/:id -> updateBooking
 router.put('/admin/update-booking-status/:id', requireRole('admin'), bookingUpdateValidation, validate, updateBooking);
