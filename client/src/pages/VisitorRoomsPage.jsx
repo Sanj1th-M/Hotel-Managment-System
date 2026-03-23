@@ -92,7 +92,7 @@ export default function VisitorRoomsPage() {
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 text-center">
                     <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-primary-400">Luxury Stays</p>
                     <h1 className="mt-4 text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-6xl">Find Your Perfect Room</h1>
-                    <p className="mx-auto mt-5 max-w-xl text-base text-slate-400">Browse our collection of rooms and suites. Book your next memorable experience with us.</p>
+                    <p className="mx-auto mt-5 max-w-xl text-base text-slate-400">Browse our collection of rooms. Book your next memorable experience with us.</p>
                 </div>
             </section>
 

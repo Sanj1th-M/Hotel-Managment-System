@@ -10,7 +10,7 @@ class ChatbotService {
             if (lowerMessage.includes('price')) {
                 const priceList = await pool.query('SELECT room_type, price_per_night FROM rooms GROUP BY room_type, price_per_night');
                 if (priceList.rows.length > 0) {
-                    botReply = 'Here is our general price list:\n' + priceList.rows.map(r => `- ${r.room_type}: $${r.price_per_night}`).join('\n');
+                    botReply = 'Here is our general price list:\n' + priceList.rows.map(r => `- ${r.room_type}: ₹${r.price_per_night}`).join('\n');
                 } else {
                     botReply = 'I couldn\'t fetch the price list right now.';
                 }
@@ -19,7 +19,7 @@ class ChatbotService {
                 const available = await pool.query('SELECT COUNT(*) FROM rooms WHERE status != $1', ['maintenance']);
                 botReply = `We currently have ${available.rows[0].count} rooms available for booking. You can check specific dates in the booking section!`;
             } else if (lowerMessage.includes('cancel booking') || lowerMessage.includes('cancel my booking')) {
-                botReply = 'To cancel a booking, please go to your "My Bookings" page and click cancel next to the active booking. Note that cancellations made 48 hours before check-in are fully refundable.';
+                botReply = 'To cancel a booking, please go to your "My Bookings" page and click cancel next to the active booking.';
             } else {
                 // Fallback: search chat_faq table
                 // Very basic search by trying to find a matching keyword

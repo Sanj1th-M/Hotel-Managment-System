@@ -223,7 +223,7 @@ export default function CreateBookingPage() {
                                                         </span>
                                                     </div>
                                                     <p className="mt-2 text-sm leading-6 text-slate-500">
-                                                        Floor {room.floor_number} | {room.capacity} guests | <span className="font-semibold text-primary-700">${room.price_per_night}/night</span>
+                                                        Floor {room.floor_number} | {room.capacity} guests | <span className="font-semibold text-primary-700">₹{room.price_per_night}/night</span>
                                                     </p>
                                                     {room.description && <p className="mt-2 text-sm text-slate-500">{room.description}</p>}
                                                 </div>
@@ -296,10 +296,10 @@ export default function CreateBookingPage() {
                             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Estimated total</p>
                             <div className="mt-3 flex items-end justify-between gap-4">
                                 <div>
-                                    <p className="text-3xl font-bold">${totalPrice.toFixed(2)}</p>
+                                    <p className="text-3xl font-bold">₹{totalPrice.toFixed(2)}</p>
                                     <p className="mt-2 text-sm text-white/70">{nights > 0 ? `${nights} night${nights > 1 ? 's' : ''}` : 'Pick valid dates'}</p>
                                 </div>
-                                {selectedRoom && <p className="text-sm text-white/70">${selectedRoom.price_per_night}/night</p>}
+                                {selectedRoom && <p className="text-sm text-white/70">₹{selectedRoom.price_per_night}/night</p>}
                             </div>
                         </div>
                     </section>
@@ -307,7 +307,7 @@ export default function CreateBookingPage() {
                     <section className="section-card p-5">
                         <div className="flex flex-col gap-3">
                             <button type="submit" disabled={isSubmitting || !selectedRoom} className="btn-primary w-full">
-                                {isSubmitting ? 'Creating booking...' : `Confirm booking${totalPrice ? ` - $${totalPrice.toFixed(2)}` : ''}`}
+                                {isSubmitting ? 'Creating booking...' : `Confirm booking${totalPrice ? ` - ₹${totalPrice.toFixed(2)}` : ''}`}
                             </button>
                             <button type="button" onClick={() => navigate('/bookings')} className="btn-secondary w-full">
                                 Cancel

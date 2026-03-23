@@ -88,7 +88,7 @@ const createTables = async () => {
 
         await client.query('COMMIT');
         console.log('✅ Database tables created successfully.');
-        console.log('   Tables: users, rooms, bookings');
+        console.log('   Tables: users, rooms, bookings, revoked_tokens');
         console.log('\n   Next step: node scripts/seed.js');
     } catch (err) {
         await client.query('ROLLBACK');

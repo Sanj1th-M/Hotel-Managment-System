@@ -604,7 +604,7 @@ export default function RoomsPage() {
                                                 </div>
                                             </td>
                                             <td>
-                                                <p className="text-lg font-extrabold tracking-[-0.04em] text-slate-900">${room.pricePerNight}</p>
+                                                <p className="text-lg font-extrabold tracking-[-0.04em] text-slate-900">₹{room.pricePerNight}</p>
                                                 <p className="mt-2 text-sm text-slate-400">Per night</p>
                                             </td>
                                             <td>

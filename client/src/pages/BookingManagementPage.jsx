@@ -225,7 +225,7 @@ export default function BookingManagementPage() {
                                         </td>
                                         <td className="text-sm text-slate-600">{format(new Date(booking.checkInDate), 'dd MMM yy')}</td>
                                         <td className="text-sm text-slate-600">{format(new Date(booking.checkOutDate), 'dd MMM yy')}</td>
-                                        <td className="text-sm font-semibold text-slate-900">${booking.totalPrice?.toFixed(2)}</td>
+                                        <td className="text-sm font-semibold text-slate-900">₹{booking.totalPrice?.toFixed(2)}</td>
                                         <td><StatusBadge status={booking.bookingStatus} /></td>
                                         <td>
                                             <div className="flex flex-wrap items-center gap-2">

@@ -73,21 +73,21 @@ const seedData = async () => {
         const roomCount = await client.query('SELECT COUNT(*) FROM rooms');
         if (parseInt(roomCount.rows[0].count, 10) === 0) {
             const rooms = [
-                { room_number: 101, room_type: 'standard', price_per_night: 80, floor_number: 1, capacity: 2, description: 'Cozy standard room with garden view', status: 'available' },
-                { room_number: 102, room_type: 'standard', price_per_night: 80, floor_number: 1, capacity: 2, description: 'Comfortable standard room near pool', status: 'available' },
-                { room_number: 201, room_type: 'deluxe', price_per_night: 150, floor_number: 2, capacity: 3, description: 'Spacious deluxe room with city view', status: 'available' },
-                { room_number: 202, room_type: 'deluxe', price_per_night: 150, floor_number: 2, capacity: 3, description: 'Premium deluxe room with balcony', status: 'available' },
-                { room_number: 301, room_type: 'suite', price_per_night: 280, floor_number: 3, capacity: 4, description: 'Luxury suite with panoramic view and jacuzzi', status: 'available' },
-                { room_number: 302, room_type: 'suite', price_per_night: 300, floor_number: 3, capacity: 5, description: 'Presidential suite with private dining area', status: 'available' },
-                { room_number: 103, room_type: 'standard', price_per_night: 85, floor_number: 1, capacity: 2, description: 'Standard room with mountain view', status: 'maintenance' },
-                { room_number: 203, room_type: 'deluxe', price_per_night: 160, floor_number: 2, capacity: 3, description: 'Deluxe room with ocean view', status: 'available' },
+                { room_number: 101, room_type: 'AC',     price_per_night: 80,  floor_number: 1, capacity: 2, description: 'AC room with garden view',                          status: 'available' },
+                { room_number: 102, room_type: 'AC',     price_per_night: 80,  floor_number: 1, capacity: 2, description: 'AC room near pool',                                  status: 'available' },
+                { room_number: 201, room_type: 'NON AC', price_per_night: 150, floor_number: 2, capacity: 3, description: 'Spacious NON AC room with city view',                 status: 'available' },
+                { room_number: 202, room_type: 'NON AC', price_per_night: 150, floor_number: 2, capacity: 3, description: 'NON AC room with balcony',                            status: 'available' },
+                { room_number: 301, room_type: 'VIP',    price_per_night: 280, floor_number: 3, capacity: 4, description: 'VIP suite with panoramic view and jacuzzi',            status: 'available' },
+                { room_number: 302, room_type: 'VIP',    price_per_night: 300, floor_number: 3, capacity: 5, description: 'Presidential VIP suite with private dining area',      status: 'available' },
+                { room_number: 103, room_type: 'AC',     price_per_night: 85,  floor_number: 1, capacity: 2, description: 'AC room with mountain view',                          status: 'maintenance' },
+                { room_number: 203, room_type: 'NON AC', price_per_night: 160, floor_number: 2, capacity: 3, description: 'NON AC room with ocean view',                         status: 'available' },
             ];
 
             for (const room of rooms) {
                 await client.query(
-                    `INSERT INTO rooms (room_number, room_type, price_per_night, floor_number, capacity, description, status)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-                    [room.room_number, room.room_type, room.price_per_night, room.floor_number, room.capacity, room.description, room.status]
+                    `INSERT INTO rooms (room_number, room_type, price_per_night, floor_number, capacity, description, status, image_url)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+                    [room.room_number, room.room_type, room.price_per_night, room.floor_number, room.capacity, room.description, room.status, null]
                 );
             }
             console.log(`✅ ${rooms.length} sample rooms created.`);

@@ -45,7 +45,7 @@ const registerValidation = [
         .matches(/^\+?[\d\s\-()]{7,20}$/).withMessage('Invalid phone number'),
     body('age')
         .optional({ nullable: true })
-        .isInt({ min: 1, max: 150 }).withMessage('Age must be between 1 and 150'),
+        .isInt({ min: 19, max: 150 }).withMessage('Age must be greater than 18'),
 ];
 
 // ─── POST /api/auth/login ─────────────────────────────────────────────────────

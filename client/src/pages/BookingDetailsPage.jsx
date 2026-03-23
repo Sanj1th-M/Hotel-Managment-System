@@ -122,7 +122,7 @@ export default function BookingDetailsPage() {
                     </div>
                     <div className="rounded-[24px] border border-white/80 bg-white/95 p-5 shadow-panel">
                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Total value</p>
-                        <p className="mt-3 text-2xl font-bold text-slate-900">${booking.totalPrice?.toFixed(2)}</p>
+                        <p className="mt-3 text-2xl font-bold text-slate-900">₹{booking.totalPrice?.toFixed(2)}</p>
                         <p className="mt-2 text-sm text-slate-500">{nights} night{nights > 1 ? 's' : ''} booked</p>
                     </div>
                 </div>
@@ -160,8 +160,8 @@ export default function BookingDetailsPage() {
                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Billing</p>
                         <div className="mt-3 flex items-end justify-between gap-4">
                             <div>
-                                <p className="text-3xl font-bold">${booking.totalPrice?.toFixed(2)}</p>
-                                <p className="mt-2 text-sm text-white/70">{nights} night{nights > 1 ? 's' : ''} x ${booking.room?.pricePerNight}/night</p>
+                                <p className="text-3xl font-bold">₹{booking.totalPrice?.toFixed(2)}</p>
+                                <p className="mt-2 text-sm text-white/70">{nights} night{nights > 1 ? 's' : ''} x ₹{booking.room?.pricePerNight}/night</p>
                             </div>
                         </div>
                     </div>

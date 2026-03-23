@@ -6,12 +6,7 @@
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const { Pool } = require('pg');
 
-const pool = new Pool({
-    host: 'localhost',
-    port: 5432,
-    database: 'hotel_management',
-    user: 'postgres',
-});
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const migrate = async () => {
     const client = await pool.connect();

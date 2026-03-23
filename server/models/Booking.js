@@ -17,6 +17,7 @@ const SELECT_BOOKING = `
         b.total_price,
         b.booking_status,
         b.notes,
+        b.persons,
         b.created_at,
         -- Room details
         r.id           AS room_id,
@@ -47,6 +48,7 @@ const toBookingObject = (row) => ({
     totalPrice: isNaN(parseFloat(row.total_price)) ? 0 : parseFloat(row.total_price),
     bookingStatus: row.booking_status,
     notes: row.notes,
+    persons: row.persons,
     createdAt: row.created_at,
     room: row.room_id
         ? {

@@ -1,15 +1,10 @@
 /**
- * Script to add image_url using postgres superuser
+ * Script to add image_url column to rooms table
  */
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const { Pool } = require('pg');
 
-const pool = new Pool({
-    host: 'localhost',
-    port: 5432,
-    database: 'hotel_management',
-    user: 'postgres',
-    // We assume postgres has peer or pgpass access. If it needs a password, it'll fail.
-});
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const migrate = async () => {
     try {
